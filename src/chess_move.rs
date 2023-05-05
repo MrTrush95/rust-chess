@@ -1,11 +1,12 @@
+#[derive(Debug)]
 pub struct ChessMove(u16);
 
 pub const START_MASK: u16 = 0b0000000000111111;
 pub const TARGET_MASK: u16 = 0b0000111111000000;
 
 impl ChessMove {
-    pub fn new(start: u16, target: u16) -> ChessMove {
-        ChessMove((start | (target << 6)) as u16)
+    pub fn new(start: u8, target: u8) -> ChessMove {
+        ChessMove(((start as u16) | ((target as u16) << 6)) as u16)
     }
 
     pub fn get_start_index(&self) -> u8 {
@@ -23,8 +24,8 @@ mod test {
 
     #[test]
     fn test_chess_move() {
-        let start: u16 = 8;
-        let target: u16 = 16;
+        let start: u8 = 8;
+        let target: u8 = 16;
 
         let chess_move = ChessMove::new(start, target);
 

@@ -2,8 +2,7 @@ extern crate num;
 #[macro_use]
 extern crate num_derive;
 
-use piece::Piece;
-use ui::draw_board;
+use ui::start_game;
 
 use crate::board::Board;
 
@@ -17,9 +16,7 @@ pub mod piece;
 pub mod ui;
 
 fn main() {
-    let mut board = Board::default();
+    let board = Board::default();
 
-    board.squares[0] = Some(Piece::new(piece::PieceType::Pawn, color::Color::White));
-
-    draw_board(board);
+    start_game(&board);
 }
