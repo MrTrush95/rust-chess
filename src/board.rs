@@ -1,4 +1,4 @@
-use crate::{color::Color, error::Error, piece::Piece};
+use crate::{color::Color, error::Error, fen::Fen, piece::Piece};
 
 #[derive(Debug)]
 pub struct Board {
@@ -7,11 +7,15 @@ pub struct Board {
 }
 
 impl Board {
-    pub fn new() -> Board {
+    pub fn new(squares: [Option<Piece>; 64]) -> Board {
         Board {
             side_to_move: Color::White,
-            squares: [None; 64],
+            squares,
         }
+    }
+
+    pub fn default() -> Board {
+        Fen::create_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR".to_owned())
     }
 
     pub fn try_make_move() -> Result<(), Error> {

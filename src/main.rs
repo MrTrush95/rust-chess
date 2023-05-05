@@ -10,11 +10,12 @@ use crate::board::Board;
 pub mod board;
 pub mod color;
 pub mod error;
+pub mod fen;
 pub mod piece;
 pub mod ui;
 
 fn main() {
-    let mut board = Board::new();
+    let mut board = Board::default();
 
     board.squares[0] = Some(Piece::new(piece::PieceType::Pawn, color::Color::White));
 

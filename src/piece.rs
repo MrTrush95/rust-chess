@@ -26,6 +26,25 @@ impl Piece {
         Piece(((color as u8) << 3) | piece_type as u8)
     }
 
+    pub fn from_notation(notation: char) -> Piece {
+        let is_white = notation.is_ascii_uppercase();
+        let notation = notation.to_ascii_lowercase();
+
+        let piece_type = match notation {
+            'p' => PieceType::Pawn,
+            'n' => PieceType::Knight,
+            'b' => PieceType::Bishop,
+            'r' => PieceType::Rook,
+            'q' => PieceType::Queen,
+            'k' => PieceType::King,
+            _ => unreachable!(),
+        };
+
+        let color = if is_white { Color::White } else { Color::Black };
+
+        Piece::new(piece_type, color)
+    }
+
     pub fn get_color(&self) -> Color {
         num::FromPrimitive::from_u8((self.0 & COLOR_MASK) >> 3).expect("color")
     }
