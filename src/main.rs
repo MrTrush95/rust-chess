@@ -8,9 +8,11 @@ use ui::draw_board;
 use crate::board::Board;
 
 pub mod board;
+pub mod chess_move;
 pub mod color;
 pub mod error;
 pub mod fen;
+pub mod move_generator;
 pub mod piece;
 pub mod ui;
 
