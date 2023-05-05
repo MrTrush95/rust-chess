@@ -3,7 +3,7 @@ use crate::{color::Color, error::Error, piece::Piece};
 #[derive(Debug)]
 pub struct Board {
     side_to_move: Color,
-    squares: [Option<Piece>; 64],
+    pub squares: [Option<Piece>; 64],
 }
 
 impl Board {
