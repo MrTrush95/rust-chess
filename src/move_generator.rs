@@ -1,7 +1,9 @@
 use crate::{
     board::Board,
     chess_move::ChessMove,
+    color::Color,
     piece::{Piece, PieceType},
+    rank::Rank,
 };
 
 pub struct MoveGenerator {
@@ -20,7 +22,7 @@ impl MoveGenerator {
     fn generate_legal_moves(&mut self, board: &Board) {
         for (square_index, square) in board.squares.iter().enumerate() {
             let chess_moves = match square {
-                Some(piece) => self.generate_pieces_moves(board, piece, square_index),
+                Some(piece) => self.generate_pieces_moves(board, piece, square_index as u8),
                 None => None,
             };
 
@@ -34,7 +36,7 @@ impl MoveGenerator {
         &self,
         board: &Board,
         piece: &Piece,
-        square_index: usize,
+        square_index: u8,
     ) -> Option<Vec<ChessMove>> {
         if piece.get_color() != board.side_to_move {
             return None;
@@ -56,12 +58,37 @@ impl MoveGenerator {
         &self,
         board: &Board,
         piece: &Piece,
-        square_index: usize,
+        square_index: u8,
     ) -> Vec<ChessMove> {
-        let moves: Vec<ChessMove> = vec![];
+        let mut moves: Vec<ChessMove> = vec![];
 
-        // 1. Handle basic move
-        // 2. Handle moving by two squares on start row
+        let forward_move: i8 = 8;
+        let forward_move_two: i8 = 16;
+        let rank = Rank::from_square(square_index);
+        let direction: i8 = if piece.is_color(Color::White) { -1 } else { 1 };
+
+        // Handle basic move
+        let space_occupied =
+            board.squares[(square_index as i8 + (forward_move * direction)) as usize].is_some();
+
+        if !space_occupied {
+            moves.push(ChessMove::new(
+                square_index,
+                (square_index as i8 + (forward_move * direction)) as u8,
+            ));
+        }
+
+        // Handle moving by two squares on start row
+        let space_occupied =
+            board.squares[(square_index as i8 + (forward_move_two * direction)) as usize].is_some();
+
+        if rank.is_pawn_rank(piece.get_color()) && !space_occupied {
+            moves.push(ChessMove::new(
+                square_index,
+                (square_index as i8 + (forward_move_two * direction)) as u8,
+            ));
+        }
+
         // 3. Handle attacks
         // 4. Handle en-passant
         // 5. Handle promotion
@@ -74,7 +101,7 @@ impl MoveGenerator {
         &self,
         board: &Board,
         piece: &Piece,
-        square_index: usize,
+        square_index: u8,
     ) -> Vec<ChessMove> {
         let moves: Vec<ChessMove> = vec![];
 
@@ -85,7 +112,7 @@ impl MoveGenerator {
         &self,
         board: &Board,
         piece: &Piece,
-        square_index: usize,
+        square_index: u8,
     ) -> Vec<ChessMove> {
         let moves: Vec<ChessMove> = vec![];
 
@@ -96,7 +123,7 @@ impl MoveGenerator {
         &self,
         board: &Board,
         piece: &Piece,
-        square_index: usize,
+        square_index: u8,
     ) -> Vec<ChessMove> {
         let moves: Vec<ChessMove> = vec![];
 
@@ -107,7 +134,7 @@ impl MoveGenerator {
         &self,
         board: &Board,
         piece: &Piece,
-        square_index: usize,
+        square_index: u8,
     ) -> Vec<ChessMove> {
         let moves: Vec<ChessMove> = vec![];
 
@@ -118,7 +145,7 @@ impl MoveGenerator {
         &self,
         board: &Board,
         piece: &Piece,
-        square_index: usize,
+        square_index: u8,
     ) -> Vec<ChessMove> {
         let moves: Vec<ChessMove> = vec![];
 

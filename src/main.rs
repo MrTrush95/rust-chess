@@ -13,10 +13,11 @@ pub mod error;
 pub mod fen;
 pub mod move_generator;
 pub mod piece;
+pub mod rank;
 pub mod ui;
 
 fn main() {
-    let board = Board::default();
+    let mut board = Board::default();
 
-    start_game(&board);
+    start_game(&mut board);
 }

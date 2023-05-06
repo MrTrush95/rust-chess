@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ChessMove(u16);
 
 pub const START_MASK: u16 = 0b0000000000111111;

@@ -2,7 +2,7 @@ use std::io;
 
 use crate::board::Board;
 
-pub fn start_game(board: &Board) {
+pub fn start_game(board: &mut Board) {
     loop {
         // clear_board();
 
@@ -15,7 +15,7 @@ pub fn start_game(board: &Board) {
             .read_line(&mut buf)
             .expect("Could not parse user input");
 
-        let result = board.try_make_move(8, 16);
+        let result = board.try_make_move(48, 32);
     }
 }
 
