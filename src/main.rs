@@ -15,6 +15,7 @@ pub mod file;
 pub mod move_generator;
 pub mod piece;
 pub mod rank;
+pub mod square;
 pub mod ui;
 
 fn main() {

@@ -2,9 +2,8 @@ use crate::{
     board::Board,
     chess_move::ChessMove,
     color::Color,
-    file::File,
     piece::{Piece, PieceType},
-    rank::Rank,
+    square::Square,
 };
 
 pub struct MoveGenerator<'a> {
@@ -58,10 +57,7 @@ impl MoveGenerator<'_> {
         let mut moves: Vec<ChessMove> = vec![];
 
         let forward_move: i32 = 8;
-        // TODO: It would be great if we could have a square
-        //       struct that contains those two other struct.
-        let rank = Rank::from_square(square_index);
-        let file = File::from_square(square_index);
+        let square = Square::new(square_index);
         let offset: i32 = if piece.is_color(Color::White) { -1 } else { 1 };
 
         let mut quiet_moves: Vec<i32> = vec![forward_move * offset];
@@ -70,15 +66,15 @@ impl MoveGenerator<'_> {
         let space_ahead_occupied =
             self.board.squares[(square_index as i32 + (forward_move * offset)) as usize].is_some();
 
-        if rank.is_pawn_rank(piece.get_color()) && !space_ahead_occupied {
+        if square.get_rank().is_pawn_rank(piece.get_color()) && !space_ahead_occupied {
             quiet_moves.push(forward_move * 2 * offset);
         }
 
-        if !file.is_first_file() {
+        if !square.get_file().is_first_file() {
             attack_moves.push(7 * offset);
         }
 
-        if !file.is_last_file() {
+        if !square.get_file().is_last_file() {
             attack_moves.push(9 * offset);
         }
 
@@ -106,9 +102,9 @@ impl MoveGenerator<'_> {
             }
         }
 
-        // 4. Handle en-passant
-        // 5. Handle promotion
-        // 6. Handle King Safety
+        // TODO: Handle en-passant
+        // TODO: Handle promotion
+        // TODO: Handle King Safety
 
         moves
     }
