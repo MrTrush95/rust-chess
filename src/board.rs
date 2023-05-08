@@ -5,6 +5,7 @@ use crate::{
 
 #[derive(Debug)]
 pub struct Board {
+    pub all_moves: Vec<ChessMove>,
     pub side_to_move: Color,
     pub squares: [Option<Piece>; 64],
 }
@@ -12,6 +13,7 @@ pub struct Board {
 impl Board {
     pub fn new(squares: [Option<Piece>; 64]) -> Board {
         Board {
+            all_moves: vec![],
             side_to_move: Color::White,
             squares,
         }
@@ -43,6 +45,8 @@ impl Board {
 
         self.squares[start_square] = None;
         self.squares[target_square] = Some(piece.unwrap());
+
+        self.all_moves.push(chess_move);
 
         self.side_to_move = match self.side_to_move {
             Color::White => Color::Black,
