@@ -11,6 +11,8 @@ pub struct MoveGenerator<'a> {
     pub moves: Vec<ChessMove>,
 }
 
+pub const BISHOP_OFFSETS: [i8; 4] = [-7, 7, -9, 9];
+
 impl MoveGenerator<'_> {
     pub fn new(board: &Board) -> MoveGenerator {
         let mut move_generator = MoveGenerator {
@@ -25,23 +27,19 @@ impl MoveGenerator<'_> {
 
     fn generate_legal_moves(&mut self) {
         for (square_index, square) in self.board.squares.iter().enumerate() {
-            let chess_moves = match square {
+            match square {
                 Some(piece) => self.generate_pieces_moves(piece, square_index as u8),
-                None => None,
+                None => (),
             };
-
-            if chess_moves.is_some() {
-                self.moves.append(&mut chess_moves.unwrap());
-            }
         }
     }
 
-    fn generate_pieces_moves(&self, piece: &Piece, square_index: u8) -> Option<Vec<ChessMove>> {
+    fn generate_pieces_moves(&mut self, piece: &Piece, square_index: u8) {
         if piece.get_color() != self.board.side_to_move {
-            return None;
+            return;
         }
 
-        let moves = match piece.get_type() {
+        match piece.get_type() {
             PieceType::Pawn => self.generate_pawn_moves(piece, square_index),
             PieceType::Knight => self.generate_knight_moves(piece, square_index),
             PieceType::Bishop => self.generate_bishop_moves(piece, square_index),
@@ -49,13 +47,9 @@ impl MoveGenerator<'_> {
             PieceType::Queen => self.generate_queen_moves(piece, square_index),
             PieceType::King => self.generate_king_moves(piece, square_index),
         };
-
-        Some(moves)
     }
 
-    fn generate_pawn_moves(&self, piece: &Piece, square_index: u8) -> Vec<ChessMove> {
-        let mut moves: Vec<ChessMove> = vec![];
-
+    fn generate_pawn_moves(&mut self, piece: &Piece, square_index: u8) {
         let forward_move: i32 = 8;
         let square = Square::new(square_index);
         let offset: i32 = if piece.is_color(Color::White) { -1 } else { 1 };
@@ -83,7 +77,7 @@ impl MoveGenerator<'_> {
                 self.board.squares[(square_index as i32 + *quiet_move) as usize].is_some();
 
             if !space_occupied {
-                moves.push(ChessMove::new(
+                self.moves.push(ChessMove::new(
                     square_index,
                     (square_index as i32 + *quiet_move) as u8,
                 ));
@@ -95,7 +89,7 @@ impl MoveGenerator<'_> {
                 self.board.squares[(square_index as i32 + *attack_move) as usize].is_some();
 
             if space_occupied {
-                moves.push(ChessMove::new(
+                self.moves.push(ChessMove::new(
                     square_index,
                     (square_index as i32 + *attack_move) as u8,
                 ));
@@ -105,37 +99,41 @@ impl MoveGenerator<'_> {
         // TODO: Handle en-passant
         // TODO: Handle promotion
         // TODO: Handle King Safety
-
-        moves
     }
 
-    fn generate_knight_moves(&self, piece: &Piece, square_index: u8) -> Vec<ChessMove> {
-        let moves: Vec<ChessMove> = vec![];
+    fn generate_knight_moves(&self, piece: &Piece, square_index: u8) {}
 
-        moves
+    fn generate_bishop_moves(&mut self, piece: &Piece, square_index: u8) {
+        for offset in BISHOP_OFFSETS.iter() {
+            for next in 0..8 {
+                let target_square_index = (square_index as i8) + offset * (next + 1);
+
+                if !Square::is_valid(target_square_index) {
+                    break;
+                }
+
+                match self.board.squares[target_square_index as usize] {
+                    Some(target_piece) => {
+                        if !target_piece.is_color(piece.get_color()) {
+                            self.add_move(square_index, target_square_index as u8);
+                        }
+                        break;
+                    }
+                    None => {
+                        self.add_move(square_index, target_square_index as u8);
+                    }
+                }
+            }
+        }
     }
 
-    fn generate_bishop_moves(&self, piece: &Piece, square_index: u8) -> Vec<ChessMove> {
-        let moves: Vec<ChessMove> = vec![];
+    fn generate_rook_moves(&self, piece: &Piece, square_index: u8) {}
 
-        moves
-    }
+    fn generate_queen_moves(&self, piece: &Piece, square_index: u8) {}
 
-    fn generate_rook_moves(&self, piece: &Piece, square_index: u8) -> Vec<ChessMove> {
-        let moves: Vec<ChessMove> = vec![];
+    fn generate_king_moves(&self, piece: &Piece, square_index: u8) {}
 
-        moves
-    }
-
-    fn generate_queen_moves(&self, piece: &Piece, square_index: u8) -> Vec<ChessMove> {
-        let moves: Vec<ChessMove> = vec![];
-
-        moves
-    }
-
-    fn generate_king_moves(&self, piece: &Piece, square_index: u8) -> Vec<ChessMove> {
-        let moves: Vec<ChessMove> = vec![];
-
-        moves
+    fn add_move(&mut self, start: u8, target: u8) {
+        self.moves.push(ChessMove::new(start, target));
     }
 }

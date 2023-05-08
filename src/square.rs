@@ -7,6 +7,10 @@ impl Square {
         Square(index)
     }
 
+    pub fn is_valid(index: i8) -> bool {
+        index >= 0 && index <= 63
+    }
+
     pub fn get_rank(&self) -> Rank {
         Rank::from_square(self.0)
     }
