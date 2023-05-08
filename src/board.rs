@@ -21,16 +21,14 @@ impl Board {
         Fen::create_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR".to_owned())
     }
 
-    pub fn try_make_move(&mut self, start: u8, target: u8) -> Result<(), Error> {
+    pub fn try_make_move(&mut self, user_move: ChessMove) -> Result<(), Error> {
         // Get all the legal move possible in the current position
         let legal_moves = MoveGenerator::new(&self).moves;
 
-        let try_move = ChessMove::new(start, target);
-
         // Check for the validity of the current move
-        if legal_moves.iter().any(|&m| m == try_move) {
+        if legal_moves.iter().any(|&m| m == user_move) {
             // If it is valid, proceed forward and make the move
-            self.make_move(try_move);
+            self.make_move(user_move);
         }
 
         //  Otherwise, return Error::InvalidMove
@@ -45,5 +43,10 @@ impl Board {
 
         self.squares[start_square] = None;
         self.squares[target_square] = Some(piece.unwrap());
+
+        self.side_to_move = match self.side_to_move {
+            Color::White => Color::Black,
+            Color::Black => Color::White,
+        }
     }
 }

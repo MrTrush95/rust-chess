@@ -1,21 +1,23 @@
 use std::io;
 
-use crate::board::Board;
+use crate::{board::Board, chess_move::ChessMove};
 
 pub fn start_game(board: &mut Board) {
     loop {
-        // clear_board();
+        clear_board();
 
         draw_board(&board);
 
         println!("Enter the move coordinates: ");
 
-        let mut buf = String::new();
+        let mut user_move = String::new();
         io::stdin()
-            .read_line(&mut buf)
+            .read_line(&mut user_move)
             .expect("Could not parse user input");
 
-        let result = board.try_make_move(48, 32);
+        let user_move = parse_user_move(user_move.trim().to_owned());
+
+        let result = board.try_make_move(user_move);
     }
 }
 
@@ -55,4 +57,27 @@ fn draw_next_rank() {
 
 fn draw_ranks() {
     println!("\n    a  b  c  d  e  f  g  h");
+}
+
+fn parse_user_move(user_move: String) -> ChessMove {
+    // TODO: Refactor this to a better implementation, this
+    //       is temporary and use only for testing purpose.
+    let mut moves = user_move.split_whitespace().into_iter();
+
+    let start = parse_coord(moves.next().unwrap());
+    let target = parse_coord(moves.next().unwrap());
+
+    ChessMove::new(start, target)
+}
+
+fn parse_coord(coord: &str) -> u8 {
+    // TODO: Refactor this to a better implementation, this
+    //       is temporary and use only for testing purpose.
+    let letters = String::from("abcdefgh");
+    let mut chars = coord.chars();
+
+    let col = letters.find(chars.next().unwrap()).unwrap();
+    let row = 8 - chars.next().unwrap().to_digit(10).unwrap() as usize;
+
+    (row * 8 + col) as u8
 }

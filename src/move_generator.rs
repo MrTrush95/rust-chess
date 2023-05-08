@@ -2,6 +2,7 @@ use crate::{
     board::Board,
     chess_move::ChessMove,
     color::Color,
+    file::File,
     piece::{Piece, PieceType},
     rank::Rank,
 };
@@ -62,34 +63,55 @@ impl MoveGenerator {
     ) -> Vec<ChessMove> {
         let mut moves: Vec<ChessMove> = vec![];
 
-        let forward_move: i8 = 8;
-        let forward_move_two: i8 = 16;
+        let forward_move: i32 = 8;
+        // TODO: It would be great if we could have a square
+        //       struct that contains those two other struct.
         let rank = Rank::from_square(square_index);
-        let direction: i8 = if piece.is_color(Color::White) { -1 } else { 1 };
+        let file = File::from_square(square_index);
+        let offset: i32 = if piece.is_color(Color::White) { -1 } else { 1 };
 
-        // Handle basic move
-        let space_occupied =
-            board.squares[(square_index as i8 + (forward_move * direction)) as usize].is_some();
+        let mut quiet_moves: Vec<i32> = vec![forward_move * offset];
+        let mut attack_moves: Vec<i32> = vec![7, 9];
 
-        if !space_occupied {
-            moves.push(ChessMove::new(
-                square_index,
-                (square_index as i8 + (forward_move * direction)) as u8,
-            ));
+        let space_ahead_occupied =
+            board.squares[(square_index as i32 + (forward_move * offset)) as usize].is_some();
+
+        if rank.is_pawn_rank(piece.get_color()) && !space_ahead_occupied {
+            quiet_moves.push(forward_move * 2 * offset);
         }
 
-        // Handle moving by two squares on start row
-        let space_occupied =
-            board.squares[(square_index as i8 + (forward_move_two * direction)) as usize].is_some();
-
-        if rank.is_pawn_rank(piece.get_color()) && !space_occupied {
-            moves.push(ChessMove::new(
-                square_index,
-                (square_index as i8 + (forward_move_two * direction)) as u8,
-            ));
+        if !file.is_first_file() {
+            attack_moves.push(7 * offset);
         }
 
-        // 3. Handle attacks
+        if !file.is_last_file() {
+            attack_moves.push(9 * offset);
+        }
+
+        for quiet_move in quiet_moves.iter() {
+            let space_occupied =
+                board.squares[(square_index as i32 + *quiet_move) as usize].is_some();
+
+            if !space_occupied {
+                moves.push(ChessMove::new(
+                    square_index,
+                    (square_index as i32 + *quiet_move) as u8,
+                ));
+            }
+        }
+
+        for attack_move in attack_moves.iter() {
+            let space_occupied =
+                board.squares[(square_index as i32 + *attack_move) as usize].is_some();
+
+            if space_occupied {
+                moves.push(ChessMove::new(
+                    square_index,
+                    (square_index as i32 + *attack_move) as u8,
+                ));
+            }
+        }
+
         // 4. Handle en-passant
         // 5. Handle promotion
         // 6. Handle King Safety

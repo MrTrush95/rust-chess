@@ -11,6 +11,7 @@ pub mod chess_move;
 pub mod color;
 pub mod error;
 pub mod fen;
+pub mod file;
 pub mod move_generator;
 pub mod piece;
 pub mod rank;
