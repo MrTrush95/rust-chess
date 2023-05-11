@@ -11,7 +11,8 @@ pub struct MoveGenerator<'a> {
     pub moves: Vec<ChessMove>,
 }
 
-pub const BISHOP_OFFSETS: [i8; 4] = [-7, 7, -9, 9];
+pub const DIAGONAL_OFFSETS: [i8; 4] = [-7, 7, -9, 9];
+pub const ORTHOGONAL_OFFSETS: [i8; 4] = [-1, 1, -8, 8];
 
 impl MoveGenerator<'_> {
     pub fn new(board: &Board) -> MoveGenerator {
@@ -108,7 +109,22 @@ impl MoveGenerator<'_> {
     fn generate_knight_moves(&self, piece: &Piece, square_index: u8) {}
 
     fn generate_bishop_moves(&mut self, piece: &Piece, square_index: u8) {
-        for offset in BISHOP_OFFSETS.iter() {
+        self.generate_sliding_moves(piece, square_index, DIAGONAL_OFFSETS);
+    }
+
+    fn generate_rook_moves(&mut self, piece: &Piece, square_index: u8) {
+        self.generate_sliding_moves(piece, square_index, ORTHOGONAL_OFFSETS);
+    }
+
+    fn generate_queen_moves(&mut self, piece: &Piece, square_index: u8) {
+        self.generate_sliding_moves(piece, square_index, ORTHOGONAL_OFFSETS);
+        self.generate_sliding_moves(piece, square_index, DIAGONAL_OFFSETS);
+    }
+
+    fn generate_king_moves(&self, piece: &Piece, square_index: u8) {}
+
+    fn generate_sliding_moves(&mut self, piece: &Piece, square_index: u8, offsets: [i8; 4]) {
+        for offset in offsets.iter() {
             for next in 0..8 {
                 let target_square_index = (square_index as i8) + offset * (next + 1);
 
@@ -130,12 +146,6 @@ impl MoveGenerator<'_> {
             }
         }
     }
-
-    fn generate_rook_moves(&self, piece: &Piece, square_index: u8) {}
-
-    fn generate_queen_moves(&self, piece: &Piece, square_index: u8) {}
-
-    fn generate_king_moves(&self, piece: &Piece, square_index: u8) {}
 
     fn add_move(&mut self, start: u8, target: u8) {
         self.moves.push(ChessMove::new(start, target));
