@@ -13,6 +13,16 @@ pub struct MoveGenerator<'a> {
 
 pub const DIAGONAL_OFFSETS: [i8; 4] = [-7, 7, -9, 9];
 pub const ORTHOGONAL_OFFSETS: [i8; 4] = [-1, 1, -8, 8];
+pub const KNIGHT_MOVES: [(i8, i8); 8] = [
+    (2, 1),
+    (1, 2),
+    (1, -2),
+    (2, -1),
+    (-1, 2),
+    (-2, 1),
+    (-1, -2),
+    (-2, -1),
+];
 
 impl MoveGenerator<'_> {
     pub fn new(board: &Board) -> MoveGenerator {
@@ -106,7 +116,40 @@ impl MoveGenerator<'_> {
         // TODO: Handle King Safety
     }
 
-    fn generate_knight_moves(&self, piece: &Piece, square_index: u8) {}
+    fn generate_knight_moves(&mut self, piece: &Piece, square_index: u8) {
+        for offset in KNIGHT_MOVES.iter() {
+            let square = Square::new(square_index);
+
+            let rank_index = square.get_rank().get_index() as i8;
+            let file_index = square.get_file().get_index() as i8;
+
+            let offset_x = offset.0;
+            let offset_y = offset.1;
+
+            if (file_index + offset_x) < 0
+                || (file_index + offset_x) > 7
+                || (7 - rank_index + offset_y) < 0
+                || (7 - rank_index + offset_y) > 7
+            {
+                continue;
+            }
+
+            let offset_y = offset_y * 8;
+            let target_square_index = (square_index as i8 + offset_x + offset_y) as u8;
+            let target_square = self.board.squares[target_square_index as usize];
+
+            match target_square {
+                Some(target_piece) => {
+                    if !target_piece.is_color(piece.get_color()) {
+                        self.add_move(square_index, target_square_index);
+                    }
+                }
+                None => {
+                    self.add_move(square_index, target_square_index);
+                }
+            }
+        }
+    }
 
     fn generate_bishop_moves(&mut self, piece: &Piece, square_index: u8) {
         self.generate_sliding_moves(piece, square_index, DIAGONAL_OFFSETS);
@@ -121,7 +164,7 @@ impl MoveGenerator<'_> {
         self.generate_sliding_moves(piece, square_index, DIAGONAL_OFFSETS);
     }
 
-    fn generate_king_moves(&self, piece: &Piece, square_index: u8) {}
+    fn generate_king_moves(&self, _piece: &Piece, _square_index: u8) {}
 
     fn generate_sliding_moves(&mut self, piece: &Piece, square_index: u8, offsets: [i8; 4]) {
         for offset in offsets.iter() {
