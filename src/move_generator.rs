@@ -85,14 +85,18 @@ impl MoveGenerator<'_> {
         }
 
         for attack_move in attack_moves.iter() {
-            let space_occupied =
-                self.board.squares[(square_index as i32 + *attack_move) as usize].is_some();
+            let target_square = self.board.squares[(square_index as i32 + *attack_move) as usize];
 
-            if space_occupied {
-                self.moves.push(ChessMove::new(
-                    square_index,
-                    (square_index as i32 + *attack_move) as u8,
-                ));
+            match target_square {
+                Some(target_piece) => {
+                    if !target_piece.is_color(piece.get_color()) {
+                        self.moves.push(ChessMove::new(
+                            square_index,
+                            (square_index as i32 + *attack_move) as u8,
+                        ));
+                    }
+                }
+                None => (),
             }
         }
 
