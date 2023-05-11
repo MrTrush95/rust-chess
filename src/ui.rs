@@ -1,6 +1,6 @@
 use console_engine::{ConsoleEngine, KeyCode, MouseButton};
 
-use crate::{board::Board, chess_move::ChessMove, string::pad_right};
+use crate::{board::Board, chess_move::ChessMove, error::Error, string::pad_right};
 
 pub struct UI<'a> {
     board: &'a mut Board,
@@ -32,8 +32,8 @@ impl UI<'_> {
             self.engine.wait_frame();
             self.engine.clear_screen();
 
+            // if the user presses 'q' :
             if self.engine.is_key_pressed(KeyCode::Char('q')) {
-                // if the user presses 'q' :
                 break; // exits app
             }
 
@@ -126,9 +126,22 @@ impl UI<'_> {
                 let chess_move = ChessMove::new(selected_square, square);
                 let result = self.board.try_make_move(chess_move);
 
+                self.display_move_result(result);
+
                 self.selected_square = None;
             }
             None => self.selected_square = Some(square),
         }
+    }
+
+    fn display_move_result(&mut self, result: Result<(), Error>) {
+        let message = match result {
+            Ok(_) => "",
+            Err(err) => match err {
+                Error::InvalidMove => "The move is invalid",
+            },
+        };
+
+        self.message = String::from(message);
     }
 }

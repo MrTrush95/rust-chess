@@ -28,13 +28,13 @@ impl Board {
         let legal_moves = MoveGenerator::new(&self).moves;
 
         // Check for the validity of the current move
-        if legal_moves.iter().any(|&m| m == user_move) {
-            // If it is valid, proceed forward and make the move
-            self.make_move(user_move);
+        if !legal_moves.iter().any(|&m| m == user_move) {
+            return Err(Error::InvalidMove);
         }
 
-        //  Otherwise, return Error::InvalidMove
-        Err(Error::InvalidMove)
+        self.make_move(user_move);
+
+        Ok(())
     }
 
     fn make_move(&mut self, chess_move: ChessMove) {
