@@ -1,3 +1,5 @@
+use crate::square::Square;
+
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ChessMove(u16);
 
@@ -15,6 +17,14 @@ impl ChessMove {
 
     pub fn get_target_index(&self) -> u8 {
         ((&self.0 & TARGET_MASK) >> 6) as u8
+    }
+
+    pub fn get_start_square(&self) -> Square {
+        Square::new(self.get_start_index())
+    }
+
+    pub fn get_target_square(&self) -> Square {
+        Square::new(self.get_target_index())
     }
 }
 

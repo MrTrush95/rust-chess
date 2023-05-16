@@ -18,4 +18,11 @@ impl Square {
     pub fn get_file(&self) -> File {
         File::from_square(self.0)
     }
+
+    pub fn to_notation(&self) -> String {
+        let rank_notation = self.get_rank().to_notation();
+        let file_notation = self.get_file().to_notation();
+
+        format!("{}{}", file_notation, rank_notation)
+    }
 }

@@ -1,3 +1,5 @@
+use std::unreachable;
+
 pub struct File(u8);
 
 impl File {
@@ -15,6 +17,20 @@ impl File {
 
     pub fn is_last_file(&self) -> bool {
         self.0 == 7
+    }
+
+    pub fn to_notation(&self) -> char {
+        match self.0 {
+            0 => 'a',
+            1 => 'b',
+            2 => 'c',
+            3 => 'd',
+            4 => 'e',
+            5 => 'f',
+            6 => 'g',
+            7 => 'h',
+            _ => unreachable!(),
+        }
     }
 }
 

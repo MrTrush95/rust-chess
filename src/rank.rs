@@ -24,6 +24,20 @@ impl Rank {
             Color::Black => self.0 == 6,
         }
     }
+
+    pub fn to_notation(&self) -> char {
+        match self.0 {
+            0 => '8',
+            1 => '7',
+            2 => '6',
+            3 => '5',
+            4 => '4',
+            5 => '3',
+            6 => '2',
+            7 => '1',
+            _ => unreachable!(),
+        }
+    }
 }
 
 #[cfg(test)]
