@@ -88,10 +88,7 @@ impl MoveGenerator<'_> {
                 self.board.squares[(square_index as i32 + *quiet_move) as usize].is_some();
 
             if !space_occupied {
-                self.moves.push(ChessMove::new(
-                    square_index,
-                    (square_index as i32 + *quiet_move) as u8,
-                ));
+                self.try_add_move(square_index, (square_index as i32 + *quiet_move) as u8);
             }
         }
 
@@ -101,10 +98,7 @@ impl MoveGenerator<'_> {
             match target_square {
                 Some(target_piece) => {
                     if !target_piece.is_color(piece.get_color()) {
-                        self.moves.push(ChessMove::new(
-                            square_index,
-                            (square_index as i32 + *attack_move) as u8,
-                        ));
+                        self.try_add_move(square_index, (square_index as i32 + *attack_move) as u8);
                     }
                 }
                 None => (),
@@ -113,7 +107,6 @@ impl MoveGenerator<'_> {
 
         // TODO: Handle en-passant
         // TODO: Handle promotion
-        // TODO: Handle King Safety
     }
 
     fn generate_knight_moves(&mut self, piece: &Piece, square_index: u8) {
@@ -141,11 +134,11 @@ impl MoveGenerator<'_> {
             match target_square {
                 Some(target_piece) => {
                     if !target_piece.is_color(piece.get_color()) {
-                        self.add_move(square_index, target_square_index);
+                        self.try_add_move(square_index, target_square_index);
                     }
                 }
                 None => {
-                    self.add_move(square_index, target_square_index);
+                    self.try_add_move(square_index, target_square_index);
                 }
             }
         }
@@ -187,19 +180,20 @@ impl MoveGenerator<'_> {
                 match self.board.squares[target_square_index as usize] {
                     Some(target_piece) => {
                         if !target_piece.is_color(piece.get_color()) {
-                            self.add_move(square_index, target_square_index as u8);
+                            self.try_add_move(square_index, target_square_index as u8);
                         }
                         break;
                     }
                     None => {
-                        self.add_move(square_index, target_square_index as u8);
+                        self.try_add_move(square_index, target_square_index as u8);
                     }
                 }
             }
         }
     }
 
-    fn add_move(&mut self, start: u8, target: u8) {
+    fn try_add_move(&mut self, start: u8, target: u8) {
+        // TODO: Handle King Safety
         self.moves.push(ChessMove::new(start, target));
     }
 }
