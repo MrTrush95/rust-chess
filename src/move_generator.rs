@@ -152,23 +152,32 @@ impl MoveGenerator<'_> {
     }
 
     fn generate_bishop_moves(&mut self, piece: &Piece, square_index: u8) {
-        self.generate_sliding_moves(piece, square_index, DIAGONAL_OFFSETS);
+        self.generate_sliding_moves(piece, square_index, DIAGONAL_OFFSETS, 8);
     }
 
     fn generate_rook_moves(&mut self, piece: &Piece, square_index: u8) {
-        self.generate_sliding_moves(piece, square_index, ORTHOGONAL_OFFSETS);
+        self.generate_sliding_moves(piece, square_index, ORTHOGONAL_OFFSETS, 8);
     }
 
     fn generate_queen_moves(&mut self, piece: &Piece, square_index: u8) {
-        self.generate_sliding_moves(piece, square_index, ORTHOGONAL_OFFSETS);
-        self.generate_sliding_moves(piece, square_index, DIAGONAL_OFFSETS);
+        self.generate_sliding_moves(piece, square_index, ORTHOGONAL_OFFSETS, 8);
+        self.generate_sliding_moves(piece, square_index, DIAGONAL_OFFSETS, 8);
     }
 
-    fn generate_king_moves(&self, _piece: &Piece, _square_index: u8) {}
+    fn generate_king_moves(&mut self, piece: &Piece, square_index: u8) {
+        self.generate_sliding_moves(piece, square_index, ORTHOGONAL_OFFSETS, 1);
+        self.generate_sliding_moves(piece, square_index, DIAGONAL_OFFSETS, 1);
+    }
 
-    fn generate_sliding_moves(&mut self, piece: &Piece, square_index: u8, offsets: [i8; 4]) {
+    fn generate_sliding_moves(
+        &mut self,
+        piece: &Piece,
+        square_index: u8,
+        offsets: [i8; 4],
+        max_dist: i8,
+    ) {
         for offset in offsets.iter() {
-            for next in 0..8 {
+            for next in 0..max_dist {
                 let target_square_index = (square_index as i8) + offset * (next + 1);
 
                 if !Square::is_valid(target_square_index) {
