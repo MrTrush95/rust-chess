@@ -3,7 +3,7 @@ use crate::{
     piece::Piece,
 };
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Board {
     pub all_moves: Vec<ChessMove>,
     pub side_to_move: Color,
