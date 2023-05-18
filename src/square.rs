@@ -19,6 +19,10 @@ impl Square {
         File::from_square(self.0)
     }
 
+    pub fn to_index(&self) -> u8 {
+        self.0
+    }
+
     pub fn to_notation(&self) -> String {
         let rank_notation = self.get_rank().to_notation();
         let file_notation = self.get_file().to_notation();

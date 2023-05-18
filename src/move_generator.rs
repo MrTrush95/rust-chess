@@ -9,6 +9,7 @@ use crate::{
 pub struct MoveGenerator<'a> {
     board: &'a Board,
     pub moves: Vec<ChessMove>,
+    pub quiet: bool,
 }
 
 pub const DIAGONAL_OFFSETS: [i8; 4] = [-7, 7, -9, 9];
@@ -25,10 +26,11 @@ pub const KNIGHT_MOVES: [(i8, i8); 8] = [
 ];
 
 impl MoveGenerator<'_> {
-    pub fn new(board: &Board) -> MoveGenerator {
+    pub fn new(board: &Board, quiet: bool) -> MoveGenerator {
         let mut move_generator = MoveGenerator {
             board,
             moves: vec![],
+            quiet,
         };
 
         move_generator.generate_legal_moves();
@@ -193,7 +195,51 @@ impl MoveGenerator<'_> {
     }
 
     fn try_add_move(&mut self, start: u8, target: u8) {
-        // TODO: Handle King Safety
-        self.moves.push(ChessMove::new(start, target));
+        if self.quiet {
+            return self.moves.push(ChessMove::new(start, target));
+        }
+
+        let start_square = Square::new(start);
+        let target_square = Square::new(target);
+
+        let is_pinned = &self.is_pinned(start_square, target_square);
+
+        if !is_pinned {
+            self.moves.push(ChessMove::new(start, target));
+        }
+    }
+
+    fn is_pinned(&mut self, start: Square, target: Square) -> bool {
+        let chess_move: ChessMove = ChessMove::new(start.to_index(), target.to_index());
+        let mut analysis_board: Board = self.board.clone();
+
+        analysis_board.make_move(chess_move);
+        let current_king_square: u8 = self.board.get_king_position();
+
+        let opponent_moves: Vec<ChessMove> = MoveGenerator::new(&analysis_board, true).moves;
+
+        let king_under_attack: bool = opponent_moves
+            .iter()
+            .any(|m: &ChessMove| m.get_target_index() == current_king_square);
+
+        if king_under_attack {
+            for chess_move in opponent_moves.iter() {
+                if chess_move.get_target_index() == current_king_square {
+                    println!(
+                        "{} {}",
+                        chess_move.get_start_square().to_notation(),
+                        chess_move.get_target_square().to_notation()
+                    );
+                }
+            }
+            println!(
+                "KING UNDER ATTACK {} {} {}",
+                current_king_square,
+                start.to_notation(),
+                target.to_notation()
+            );
+        }
+
+        king_under_attack
     }
 }

@@ -16,18 +16,13 @@ fn it_generate_valid_moves(#[case] depth: i32, #[case] nodes: u64) {
 
 fn perft(board: Board, depth: i32) -> u64 {
     let mut move_count = 0;
-    let move_generator = MoveGenerator::new(&board);
+    let move_generator = MoveGenerator::new(&board, false);
 
     if depth == 1 {
         return move_generator.moves.len() as u64;
     }
 
     for chess_move in move_generator.moves.iter() {
-        let start = chess_move.get_start_square().to_notation();
-        let target = chess_move.get_target_square().to_notation();
-
-        println!("{start}{target}");
-
         let mut clone_board = board.clone();
 
         clone_board
